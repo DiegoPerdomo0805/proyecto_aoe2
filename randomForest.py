@@ -20,8 +20,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0)
 
 scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train[:, :3])
-X_test = scaler.transform(X_test[:, :3])
+X_train = scaler.fit_transform(X_train[:, :4])
+X_test = scaler.transform(X_test[:, :4])
 
 param_grid = {
     'n_estimators': [10, 50, 100],
@@ -212,7 +212,7 @@ def get_faction_name(faction_number):
     return factions.get(faction_number, "Unknown")
 
 
-def analiseBestOption(user_elo, user_p2_civ):
+def analiseBestOption(user_elo, user_p2_civ, time):
 
     resultCiv = 0
     resultPoints = 0
@@ -222,7 +222,7 @@ def analiseBestOption(user_elo, user_p2_civ):
 
         # Preprocess the user inputs
         # Create a 2D array
-        user_input = np.array([[user_elo, user_p1_civ, user_p2_civ]])
+        user_input = np.array([[time, user_elo, user_p1_civ, user_p2_civ]])
         scaled_user_input = scaler.transform(user_input)
 
         # Make predictions on the scaled user inputs
@@ -237,7 +237,7 @@ def analiseBestOption(user_elo, user_p2_civ):
             resultCiv = user_p1_civ
 
     print('Your best option to win against ', get_faction_name(user_p2_civ), ' is ',
-          get_faction_name(resultCiv), ' with ', resultPoints * 100, '% probability of winning')
+          get_faction_name(resultCiv))
 
 
 menu = True
@@ -251,10 +251,19 @@ while menu:
     if choice == '1':
 
         # User inputs
-        # 1104.0,38,25,0
-        # 1080.0,25,22,1
         print('Input the elo')
         user_elo = input()
+
+        print('Input the duration \n1. Early \n2. Mid \n3. Late')
+        user_durationInput = input()
+
+        user_duration = 0
+        if user_durationInput == '1':
+            user_duration = 900
+        elif user_durationInput == '2':
+            user_duration = 1800
+        elif user_durationInput == '3':
+            user_duration = 3600
 
         # Call the function to print the civilizations
         print_civilizations()
@@ -273,7 +282,8 @@ while menu:
 
         # Preprocess the user inputs
         # Create a 2D array
-        user_input = np.array([[user_elo, user_p1_civ, user_p2_civ]])
+        user_input = np.array(
+            [[user_duration, user_elo, user_p1_civ, user_p2_civ]])
         scaled_user_input = scaler.transform(user_input)
 
         # Make predictions on the scaled user inputs
@@ -285,7 +295,7 @@ while menu:
 
         print("Probability of win:", probability_winner_1*100, "%")
 
-        analiseBestOption(user_elo, user_p2_civ)
+        analiseBestOption(user_elo, user_p2_civ, user_duration)
 
     elif choice == 2:  # Exit
         menu = False
